@@ -7,7 +7,6 @@ import { tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  // Apunta a tu backend corriendo en el puerto 3000
   private apiUrl = 'http://localhost:3000/api/auth';
 
   constructor(private http: HttpClient) {}
@@ -16,7 +15,6 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
         if (response && response.token) {
-          // Guardamos el JWT en el navegador
           localStorage.setItem('token', response.token);
         }
       })

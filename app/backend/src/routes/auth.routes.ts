@@ -3,7 +3,6 @@ import { register, login } from '../controllers/auth.controller';
 
 const router = Router();
 
-// Rutas conectadas a sus respectivos controladores
 router.post('/register', register);
 router.post('/login', login);
 
