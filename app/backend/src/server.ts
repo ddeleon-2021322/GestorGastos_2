@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-
 import authRoutes from './routes/auth.routes';
+import { env } from './config/env'
+import { database } from './config/db'
 
 const app = express();
 
@@ -10,7 +11,12 @@ app.use(cors());
 
 app.use('/api/auth', authRoutes);    
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor Backend corriendo en http://localhost:${PORT}`);
-});
+const arrancarServidor = async () => {
+  await database.conectar();
+  
+  app.listen(env.puerto, () => {
+    console.log(`Servidor Backend corriendo en http://localhost:${env.puerto}`);
+  });
+};
+
+arrancarServidor();

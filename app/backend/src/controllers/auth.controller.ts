@@ -1,50 +1,36 @@
-import type { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-
-const SECRET_KEY = process.env.SECRET_KEY || 'mi_clave_secreta_super_segura';
-
-export const users: any[] = [];
+import { database } from '../config/db';
 
 export const register = async (req: Request, res: Response): Promise<any> => {
-    const { email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Email y contraseña son obligatorios' });
-    }
-
-    const userExists = users.find(u => u.email === email);
-    if (userExists) {
-        return res.status(400).json({ message: 'El usuario ya existe' });
+    const userExistente = await database.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+    
+    if (userExistente.rows.length > 0) {
+      return res.status(400).json({ message: 'El correo ya está registrado' });
     }
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const passwordEncriptada = await bcrypt.hash(password, salt);
 
-    const newUser = { id: users.length + 1, email, password: hashedPassword };
-    users.push(newUser);
+    const result = await database.query(
+      'INSERT INTO usuarios (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email',
+      [name, email, passwordEncriptada]
+    );
 
-    return res.status(201).json({ message: 'Usuario registrado exitosamente' });
+    res.status(201).json({ 
+      message: 'Usuario registrado con éxito',
+      usuario: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Hubo un error en el servidor' });
+  }
 };
 
 export const login = async (req: Request, res: Response): Promise<any> => {
-    const { email, password } = req.body;
-
-    const user = users.find(u => u.email === email);
-    if (!user) {
-        return res.status(400).json({ message: 'Credenciales inválidas' });
-    }
-
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-        return res.status(400).json({ message: 'Credenciales inválidas' });
-    }
-
-    const token = jwt.sign(
-        { id: user.id, email: user.email },
-        SECRET_KEY,
-        { expiresIn: '2h' }
-    );
-
-    return res.json({ token, message: 'Login exitoso' });
+  res.status(200).json({ message: 'Ruta de login conectada (pendiente de integrar PostgreSQL)' });
 };
