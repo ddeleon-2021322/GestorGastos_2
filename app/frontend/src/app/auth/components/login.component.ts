@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service'; 
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -19,12 +18,18 @@ export class LoginComponent {
   };
   errorMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+constructor(private authService: AuthService, private router: Router) {}
 
   onLogin(): void {
+    this.errorMessage = '';
+    
     this.authService.login(this.credentials).subscribe({
       next: (response: any) => {
-        alert('¡Login exitoso!');
+        if (response.token) {
+          localStorage.setItem('miToken', response.token);
+          
+          this.router.navigate(['/gestor']); 
+        }
       },
       error: (err: any) => {
         this.errorMessage = err.error.message || 'Credenciales incorrectas';

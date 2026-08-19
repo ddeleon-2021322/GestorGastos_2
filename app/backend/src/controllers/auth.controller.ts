@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { database } from '../config/db';
+import jwt from 'jsonwebtoken';
 
 export const register = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -32,5 +33,33 @@ export const register = async (req: Request, res: Response): Promise<any> => {
 };
 
 export const login = async (req: Request, res: Response): Promise<any> => {
-  res.status(200).json({ message: 'Ruta de login conectada (pendiente de integrar PostgreSQL)' });
+  try {
+    const { email, password } = req.body;
+
+    const result = await database.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+    
+    if (result.rows.length === 0) {
+      return res.status(400).json({ message: 'Usuario no encontrado' });
+    }
+
+    const usuario = result.rows[0];
+
+    const passwordValida = await bcrypt.compare(password, usuario.password);
+    
+    if (!passwordValida) {
+      return res.status(400).json({ message: 'Contraseña incorrecta' });
+    }
+
+    const token = jwt.sign(
+      { id: usuario.id, email: usuario.email }, 
+      'clave_secreta_para_mis_tokens', 
+      { expiresIn: '1m' }
+    );
+
+    res.status(200).json({ message: 'Login exitoso', token });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Hubo un error en el servidor' });
+  }
 };

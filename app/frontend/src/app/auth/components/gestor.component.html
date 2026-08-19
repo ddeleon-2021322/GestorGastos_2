@@ -1,0 +1,25 @@
+<div class="gestor-container">
+  
+  <div class="header">
+    <h2>Mi Gestor de Gastos</h2>
+    <button class="btn-logout" (click)="cerrarSesion()">Cerrar Sesión</button>
+  </div>
+
+  <div class="form-container">
+    <h3>Registrar Nuevo Gasto</h3>
+    <div class="form-group">
+      <input type="text" [(ngModel)]="nuevoGasto.descripcion" placeholder="Descripción (ej. Luz, Comida)" class="input-desc">
+      <input type="number" [(ngModel)]="nuevoGasto.cantidad" placeholder="Monto" class="input-monto">
+      <button class="btn-add" (click)="agregarGasto()">Agregar</button>
+    </div>
+  </div>
+
+  <h3>Historial de Gastos</h3>
+  <ul class="lista-gastos">
+    <li *ngFor="let gasto of gastos" class="gasto-item">
+      <span>{{ gasto.descripcion }}</span>
+      <strong>$ {{ gasto.cantidad }}</strong>
+    </li>
+  </ul>
+
+</div>
