@@ -1,5 +1,6 @@
 <div class="split-login-container">
 
+  <!-- PANEL IZQUIERDO -->
   <div class="left-panel">
     <div class="branding">
       <img src="/images/LogoFintrax.png" alt="Logo de la app" class="logo">
@@ -9,10 +10,11 @@
     <div class="hero-text">
       <p class="subtitle">TU DINERO TU CONTROL!</p>
       <h1>Toma las riendas de tus <span class="highlight-green">finanzas</span> desde hoy </h1>
-      <p class="description">Registra cada movimiento , visualiza tus hábitos de consumo y planea tu futuro con tu aplicacion financiera de confianza</p>
+      <p class="description">Registra cada movimiento, visualiza tus hábitos de consumo y planea tu futuro con tu aplicación financiera de confianza</p>
     </div>
   </div>
 
+  <!-- PANEL DERECHO -->
   <div class="right-panel">
     <div class="form-wrapper">
       
@@ -20,7 +22,9 @@
       <h2>Iniciar Sesión</h2>
       <p class="form-subtitle">Por favor, ingresa tus credenciales para continuar.</p>
       
-      <form (ngSubmit)="onLogin()">
+      <!-- FORMULARIO PROTEGIDO POR ANGULAR -->
+      <form #loginForm="ngForm" (ngSubmit)="loginForm.form.valid && onLogin()">
+        
         <div class="form-group">
           <label for="email">Correo Electrónico:</label>
           <input 
@@ -43,15 +47,18 @@
             required>
         </div>
 
+        <!-- MENSAJE DE ERROR -->
         <p class="error" *ngIf="errorMessage" style="color: #ef4444; font-size: 14px; margin-bottom: 15px;">
           {{ errorMessage }}
         </p>
 
-        <button type="submit" class="btn-submit">
-          iniciar Sesión <span>&rarr;</span>
+        <!-- BOTÓN DE INGRESO -->
+        <button type="submit" class="btn-submit" [disabled]="!loginForm.valid">
+          Iniciar Sesión <span>&rarr;</span>
         </button>
       </form>
 
+      <!-- SECCIÓN DE REGISTRO -->
       <div class="register-section">
         <p>¿No tienes cuenta? <a routerLink="/register">Regístrate aquí</a></p>
         <p class="secure-text">🔒 Tus datos están protegidos</p>
