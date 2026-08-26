@@ -1,22 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+//import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-gestor',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './gestor.component.html',
   styleUrls: ['./gestor.component.css']
 })
 export class GestorComponent implements OnInit {
-  gastos = [
-    { descripcion: 'Supermercado', cantidad: 500 },
-    { descripcion: 'Internet', cantidad: 300 }
-  ];
-
-  nuevoGasto = { descripcion: '', cantidad: 0 };
+  usuario = { nombre: 'Usuario', email: 'usuario@email.com' };
+  
+  resumen = { ingresos: 0, gastos: 0, balance: 0 };
+  movimientos: any[] = []; 
 
   constructor(private router: Router) {}
 
@@ -24,13 +22,6 @@ export class GestorComponent implements OnInit {
     const token = localStorage.getItem('miToken');
     if (!token) {
       this.router.navigate(['/login']);
-    }
-  }
-
-  agregarGasto(): void {
-    if (this.nuevoGasto.descripcion && this.nuevoGasto.cantidad > 0) {
-      this.gastos.push({ ...this.nuevoGasto });
-      this.nuevoGasto = { descripcion: '', cantidad: 0 }; 
     }
   }
 
