@@ -53,7 +53,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
     const token = jwt.sign(
       { id: usuario.id, email: usuario.email }, 
       'clave_secreta_para_mis_tokens', 
-      { expiresIn: '1m' }
+      { expiresIn: '15s' }
     );
 
     res.status(200).json({ message: 'Login exitoso', token });
