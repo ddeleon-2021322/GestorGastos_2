@@ -1,15 +1,18 @@
-import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-gestor',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './gestor.component.html',
   styleUrls: ['./gestor.component.css']
 })
 export class GestorComponent implements OnInit, OnDestroy {
+  // Ajusta el tiempo de inactividad aquí ('15s', '30s', '1m', '5m', '1h')
+  readonly TIEMPO_INACTIVIDAD = '15s';
+
   usuario = { nombre: 'Usuario', email: 'usuario@email.com' };
   resumen = { ingresos: 0, gastos: 0, balance: 0 };
   movimientos: any[] = [];
@@ -27,12 +30,11 @@ export class GestorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (this.isBrowser) {
       const token = localStorage.getItem('miToken');
-
-      if (!token || this.tokenExpirado(token)) {
-        this.expulsarPorExpiracion();
-      } else {
-        this.programarExpulsion(token);
+      if (!token) {
+        this.router.navigate(['/login']);
+        return;
       }
+      this.reiniciarTemporizador();
     }
   }
 
@@ -42,36 +44,38 @@ export class GestorComponent implements OnInit, OnDestroy {
     }
   }
 
-  private tokenExpirado(token: string): boolean {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return Date.now() >= payload.exp * 1000;
-    } catch (e) {
-      return true;
+  // Reinicia la cuenta atrás con cada movimiento, clic, tecla o scroll
+  @HostListener('window:mousemove')
+  @HostListener('window:keydown')
+  @HostListener('window:click')
+  @HostListener('window:scroll')
+  reiniciarTemporizador(): void {
+    if (!this.isBrowser) return;
+
+    if (this.temporizador) {
+      clearTimeout(this.temporizador);
     }
+
+    const ms = this.convertirAMilisegundos(this.TIEMPO_INACTIVIDAD);
+    this.temporizador = setTimeout(() => {
+      this.expulsarPorInactividad();
+    }, ms);
   }
 
-  private programarExpulsion(token: string): void {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const tiempoRestante = (payload.exp * 1000) - Date.now();
+  private convertirAMilisegundos(tiempo: string): number {
+    const unidad = tiempo.slice(-1);
+    const valor = parseInt(tiempo.slice(0, -1), 10);
 
-      if (tiempoRestante > 0) {
-        this.temporizador = setTimeout(() => {
-          this.expulsarPorExpiracion();
-        }, tiempoRestante);
-      } else {
-        this.expulsarPorExpiracion();
-      }
-    } catch (e) {
-      this.expulsarPorExpiracion();
-    }
+    if (unidad === 's') return valor * 1000;
+    if (unidad === 'm') return valor * 60 * 1000;
+    if (unidad === 'h') return valor * 60 * 60 * 1000;
+    return valor * 1000;
   }
 
-  private expulsarPorExpiracion(): void {
+  private expulsarPorInactividad(): void {
     if (this.isBrowser) {
       localStorage.removeItem('miToken');
-      alert('Su sesión ha expirado. Por favor, inicie sesión nuevamente.');
+      alert('⚠️ Su sesión ha expirado por inactividad.');
       this.router.navigate(['/login']);
     }
   }
