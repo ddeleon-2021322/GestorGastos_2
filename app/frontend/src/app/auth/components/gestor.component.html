@@ -7,15 +7,15 @@
     </div>
 
     <nav class="menu">
-      <a href="#" class="active">Inicio</a>
-      <a href="#">Ingresos</a>
+      <a routerLink="/gestor" class="active">Inicio</a>
+      <a routerLink="/ingresos">Ingresos</a>
       <a href="#">Gastos</a>
       <a href="#">Movimientos</a>
     </nav>
 
     <div class="user-profile">
       <div class="user-info">
-        <div class="avatar">U</div>
+        <div class="avatar">{{ usuario.nombre.charAt(0) || 'U' }}</div>
         <div>
           <p class="user-name">{{ usuario.nombre }}</p>
           <p class="user-email">{{ usuario.email }}</p>
@@ -43,41 +43,47 @@
         <div class="card-icon green-icon">↑</div>
         <div class="card-data">
           <p>Ingresos</p>
-          <h3 class="text-green">Q 0.00</h3>
+          <h3 class="text-green">Q {{ resumen.ingresos | number:'1.2-2' }}</h3>
         </div>
       </div>
       <div class="card">
         <div class="card-icon yellow-icon">↓</div>
         <div class="card-data">
           <p>Gastos</p>
-          <h3 class="text-yellow">Q 0.00</h3>
+          <h3 class="text-yellow">Q {{ resumen.gastos | number:'1.2-2' }}</h3>
         </div>
       </div>
       <div class="card">
         <div class="card-icon dark-icon">⚖️</div>
         <div class="card-data">
           <p>Balance</p>
-          <h3>Q 0.00</h3>
+          <h3>Q {{ resumen.balance | number:'1.2-2' }}</h3>
         </div>
       </div>
     </section>
 
     <section class="middle-section">
       
+      <!-- Panel de Gráfica Dinámica -->
       <div class="panel chart-panel">
         <h3>Resumen financiero</h3>
-        <div class="donut-chart empty-chart">
+        <div class="donut-chart" [style.background]="fondoDonut">
           <div class="donut-hole">
             <p>Balance</p>
-            <h3>Q 0.00</h3>
+            <h3>Q {{ resumen.balance | number:'1.2-2' }}</h3>
           </div>
         </div>
         <div class="chart-legend">
-          <div class="legend-item"><span class="dot green-dot"></span> Ingresos <span>0%</span></div>
-          <div class="legend-item"><span class="dot yellow-dot"></span> Gastos <span>0%</span></div>
+          <div class="legend-item">
+            <span class="dot green-dot"></span> Ingresos <span>{{ porcentajeIngresos }}%</span>
+          </div>
+          <div class="legend-item">
+            <span class="dot yellow-dot"></span> Gastos <span>{{ porcentajeGastos }}%</span>
+          </div>
         </div>
       </div>
 
+      <!-- Panel de Movimientos Recientes Dinámicos -->
       <div class="panel list-panel">
         <div class="list-header">
           <h3>Movimientos recientes</h3>
@@ -85,8 +91,18 @@
         </div>
         
         <div class="transaction-list">
-          <div class="empty-state">
+          <div *ngIf="movimientos.length === 0" class="empty-state">
             <p>No tienes movimientos registrados todavía.</p>
+          </div>
+
+          <div *ngFor="let item of movimientos" class="transaction-item">
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-weight: 500;">{{ item.titulo }}</span>
+              <span style="font-size: 0.75rem; color: #8c9ba5;">{{ item.fecha | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <span [class.text-green]="item.tipo === 'ingreso'" [class.text-yellow]="item.tipo === 'gasto'" style="font-weight: bold;">
+              {{ item.tipo === 'ingreso' ? '+' : '-' }} Q {{ item.monto | number:'1.2-2' }}
+            </span>
           </div>
         </div>
       </div>
@@ -95,7 +111,7 @@
 
     <section class="action-buttons">
       <button class="btn-yellow">+ Nuevo gasto</button>
-      <button class="btn-green">+ Nuevo ingreso</button>
+      <button routerLink="/ingresos" class="btn-green">+ Nuevo ingreso</button>
     </section>
 
   </main>
