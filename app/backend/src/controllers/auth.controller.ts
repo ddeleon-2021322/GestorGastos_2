@@ -50,11 +50,13 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       return res.status(400).json({ message: 'Contraseña incorrecta' });
     }
 
-    const token = jwt.sign(
-      { id: usuario.id, email: usuario.email }, 
-      'clave_secreta_para_mis_tokens', 
-      { expiresIn: '15s' }
-    );
+   const secret = process.env.JWT_SECRET || 'clave_secreta_para_mis_tokens';
+
+const token = jwt.sign(
+  { id: usuario.id, email: usuario.email }, 
+  secret, 
+  { expiresIn: '15s' }
+);
 
     res.status(200).json({ message: 'Login exitoso', token });
 

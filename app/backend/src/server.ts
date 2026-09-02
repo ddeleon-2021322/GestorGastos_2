@@ -4,9 +4,11 @@ import authRoutes from './routes/auth.routes';
 import { env } from './config/env'
 import { database } from './config/db'
 import { inicializarBaseDatos } from './config/init-db';
+import ingresosRoutes from './routes/ingresos.routes';
 
 const app = express();
 
+app.use('/api/ingresos', ingresosRoutes);
 app.use(express.json());
 app.use(cors());
 
