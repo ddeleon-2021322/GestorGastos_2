@@ -3,6 +3,7 @@ import cors from 'cors';
 import authRoutes from './routes/auth.routes';
 import { env } from './config/env'
 import { database } from './config/db'
+import { inicializarBaseDatos } from './config/init-db';
 
 const app = express();
 
@@ -13,6 +14,12 @@ app.use('/api/auth', authRoutes);
 
 const arrancarServidor = async () => {
   await database.conectar();
+
+  inicializarBaseDatos().then(() => {
+    app.listen(3000, () => {
+      console.log("Servidor Corriendo");
+    });
+  });
   
   app.listen(env.puerto, () => {
     console.log(`Servidor Backend corriendo en http://localhost:${env.puerto}`);
