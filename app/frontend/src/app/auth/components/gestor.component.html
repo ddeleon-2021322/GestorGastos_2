@@ -64,20 +64,26 @@
 
     <section class="middle-section">
       
+      <!-- Panel de Gráfica Dinámica -->
       <div class="panel chart-panel">
         <h3>Resumen financiero</h3>
-        <div class="donut-chart empty-chart">
+        <div class="donut-chart" [style.background]="fondoDonut">
           <div class="donut-hole">
             <p>Balance</p>
             <h3>Q {{ resumen.balance | number:'1.2-2' }}</h3>
           </div>
         </div>
         <div class="chart-legend">
-          <div class="legend-item"><span class="dot green-dot"></span> Ingresos <span>0%</span></div>
-          <div class="legend-item"><span class="dot yellow-dot"></span> Gastos <span>0%</span></div>
+          <div class="legend-item">
+            <span class="dot green-dot"></span> Ingresos <span>{{ porcentajeIngresos }}%</span>
+          </div>
+          <div class="legend-item">
+            <span class="dot yellow-dot"></span> Gastos <span>{{ porcentajeGastos }}%</span>
+          </div>
         </div>
       </div>
 
+      <!-- Panel de Movimientos Recientes Dinámicos -->
       <div class="panel list-panel">
         <div class="list-header">
           <h3>Movimientos recientes</h3>
@@ -90,8 +96,13 @@
           </div>
 
           <div *ngFor="let item of movimientos" class="transaction-item">
-            <span>{{ item.titulo }}</span>
-            <span [class.text-green]="item.tipo === 'ingreso'">Q {{ item.monto | number:'1.2-2' }}</span>
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-weight: 500;">{{ item.titulo }}</span>
+              <span style="font-size: 0.75rem; color: #8c9ba5;">{{ item.fecha | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <span [class.text-green]="item.tipo === 'ingreso'" [class.text-yellow]="item.tipo === 'gasto'" style="font-weight: bold;">
+              {{ item.tipo === 'ingreso' ? '+' : '-' }} Q {{ item.monto | number:'1.2-2' }}
+            </span>
           </div>
         </div>
       </div>

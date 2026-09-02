@@ -8,10 +8,10 @@ import ingresosRoutes from './routes/ingresos.routes';
 
 const app = express();
 
-app.use('/api/ingresos', ingresosRoutes);
 app.use(express.json());
 app.use(cors());
 
+app.use('/api/ingresos', ingresosRoutes);
 app.use('/api/auth', authRoutes);    
 
 const arrancarServidor = async () => {
